@@ -19,6 +19,10 @@ An ESPHome based monitoring system for water softener. This project tracks salt 
 - Flow Meter	Hall-effect pulse sensor	GPIO1<br/>
 - Leak Sensor	Simple insulated wire (Capacitive)	GPIO9<br/>
 
+## ESP32 Ground Plate
+![The final project insights.](https://github.com/MrJanD/SmartWaterSoftener/blob/main/images/Inside.jpg)
+![The final project - basically a simple scale with more features.](https://github.com/MrJanD/SmartWaterSoftener/blob/main/images/Outside.jpg)
+
 ## 🔌 Wiring Diagram (Logical)
 ### HX711
 <img src="images/HX711Wireing.jpg" align="right" width="300" />
@@ -31,8 +35,6 @@ Connect VCC to 3.3V, GND to GND, DT to GPIO2, and SCK to GPIO3. Weight cell inte
 - Size: 38mm * 21mm * 10mm
 
 An excellent tutorial of using 4 load cells with an HX711 with code and video tutorial can be found on [ELECTRONOOBS](https://electronoobs.com/eng_arduino_tut115_2.php). 
-
-## 
 
 ### Flow Meter
 ![Cut and stripped connection between BNT 1650 and flow meter](https://github.com/MrJanD/SmartWaterSoftener/blob/main/images/Wireing.jpg)
