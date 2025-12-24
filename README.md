@@ -19,7 +19,7 @@ An ESPHome based monitoring system for water softener. This project tracks salt 
 - Simple insulated wire for capacitive leakage sensor connected to GPIO9. <br/>
 - Spare wires, soldering iron, multimeter, ...
 
-## ESP32 Ground Plate
+## :construction: ESP32 Ground Plate
 ![The final project insights.](https://github.com/MrJanD/SmartWaterSoftener/blob/main/images/Inside.jpg)
 ![The final project - basically a simple scale with more features.](https://github.com/MrJanD/SmartWaterSoftener/blob/main/images/Outside.jpg)
 
@@ -36,7 +36,7 @@ Connect VCC to 3.3V, GND to GND, DT to GPIO2, and SCK to GPIO3. Weight cell inte
 
 An excellent tutorial of using 4 load cells with an HX711 with code and video tutorial can be found on [ELECTRONOOBS](https://electronoobs.com/eng_arduino_tut115_2.php). 
 
-### Flow Meter
+### :potable_water: Flow Meter
 ![Cut and stripped connection between BNT 1650 and flow meter](https://github.com/MrJanD/SmartWaterSoftener/blob/main/images/Wireing.jpg)
 
 The flow meter of the BNT-1650 provides a high 3.3V on the data line, which is pulled to GND every time a certain amount of water is measured. (See Sensors Provided)
@@ -44,7 +44,7 @@ The flow meter of the BNT-1650 provides a high 3.3V on the data line, which is p
 - Blue is wire-tapped by the green cable and forwarded to any available GPIO (we use GPIO1 in our code).
 - Black provides a common ground and will be connected to GND of the ESP32.
 
-### Water Leakage Wire
+### :non-potable_water: Water Leakage Wire
 Connect a single wire to GPIO9. Lay the stripped end or a conductive tape flat on the floor/bottom of the tray where water would collect. The capacitive sensor of the ESP32 will change its measured value drastically every time it touches water. This is the reason we use an ESP32 S3. In case you are using an ESP8266, ESP32-C3 or any other micro controller with no capacitive sensor, consider using an irrigation sensor or soil moisture sensor. 
 [RandomNerdTutorials](https://randomnerdtutorials.com/esp32-touch-pins-arduino-ide/) has an excellent tutorial of how to use capacitive sensor pins of an ESP32. However, it is basically connecting an stripped wire to a capacitive pin of your ESP32 (really mothing fancy at all...).
 
