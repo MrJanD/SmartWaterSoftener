@@ -13,11 +13,11 @@ An ESPHome based monitoring system for water softener. This project tracks salt 
 - Local Web Server: Live dashboard accessible directly via the device's IP address.
 
 ## 🛠 Hardware Requirements
-- Component	Description	Pin (Configurable)<br/>
 - ESP32-S3	DevKitC-1 or similar <br/>
-- HX711	Load Cell Amplifier (for salt weight)	GPIO2 (DT), GPIO3 (SCK)<br/>
-- Flow Meter	Hall-effect pulse sensor	GPIO1<br/>
-- Leak Sensor	Simple insulated wire (Capacitive)	GPIO9<br/>
+- HX711 (at least two or more) Load Cell Amplifier (for salt weight). Connected to GPIO2 (DT), GPIO3 (SCK)<br/>
+- Aqmos R2D2 series, CM series or any other water softener. <br/>
+- Simple insulated wire for capacitive leakage sensor connected to GPIO9. <br/>
+- Spare wires, soldering iron, multimeter, ...
 
 ## ESP32 Ground Plate
 ![The final project insights.](https://github.com/MrJanD/SmartWaterSoftener/blob/main/images/Inside.jpg)
