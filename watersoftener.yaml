@@ -1,0 +1,137 @@
+substitutions:
+  # Device identification and pin mapping
+  devicename: "Water Softener Sensor"
+  dt_pin: GPIO2          # HX711 Load Cell: Data Serial pin
+  sck_pin: GPIO3         # HX711 Load Cell: Clock Serial pin
+  bnt_pin: GPIO1         # Flow meter: Pulse input pin
+  capacitive_pin: GPIO9  # Leakage detection: Capacitive touch wire
+  
+  # Calibration factors for water calculation
+  pulse_factor_total: 0.02    # Conversion: pulses to Liters (Accumulated)
+  pulse_factor_current: 1.115 # Conversion: pulses to L/H (Flow rate)
+
+esphome:
+  name: "watersoftener"
+  friendly_name: watersoftener
+  platformio_options:
+    board_build.flash_mode: dio
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf # Using the native ESP-IDF framework for full S3 feature support
+
+logger: # Enable serial logging for debugging
+
+api:
+  encryption:
+    key: !secret api_key # Secure communication with Home Assistant
+
+ota:
+  - platform: esphome
+    password: !secret ota_password # Enables Over-The-Air wireless updates
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  output_power: 8.5 # Limits Wi-Fi transmit power for stability/heat
+
+  # Emergency fallback hotspot if Wi-Fi connection fails
+  ap:
+    ssid: "WaterSoftener Fallback Hotspot"
+    password: !secret fallback_password
+
+captive_portal: # Web portal for Wi-Fi config when in AP mode
+    
+web_server:
+  port: 80 # Local web interface for real-time monitoring
+
+# Configuration for the ESP32 internal touch sensing hardware
+esp32_touch:
+  setup_mode: false         # Set to true during initial testing to see raw values
+  measurement_duration: 0.25ms
+  sleep_duration: 10ms
+
+binary_sensor:
+  # Leakage detection: Triggers when the wire touches water (capacitance change)
+  - platform: esp32_touch
+    name: "Water Leakage"
+    id: binary_leakage
+    pin: ${capacitive_pin}
+    threshold: 50000 # Sensitivity threshold: must be tuned based on wire length
+
+sensor:
+  # Flow meter: Measures the time between incoming pulses
+  - platform: pulse_meter
+    name: 'Hot Water Flow Rate'
+    id: water_flow_meter
+    unit_of_measurement: 'l/h'
+    device_class: water
+    state_class: measurement
+    internal_filter: 5ms # De-bounce filter to ignore electrical noise
+    accuracy_decimals: 0
+    timeout: 1sec # Resets flow to zero if no pulses are detected for 1s
+    pin: ${bnt_pin}
+    filters:
+      - multiply: ${pulse_factor_current}
+      - throttle_average: 1s
+    # Totalizer: Sums up the total volume consumed
+    total:
+      name: "Hot Water Consumption Delta"
+      id: total_water_sensor
+      unit_of_measurement: 'l'
+      device_class: water
+      state_class: total_increasing
+      accuracy_decimals: 1
+      filters:
+        - multiply: ${pulse_factor_total}
+
+  # Scale sensor (HX711): Measures the salt stock weight
+  - platform: hx711
+    name: "Water Softener Weight"
+    id: water_softener_weight
+    dout_pin: ${dt_pin}
+    clk_pin: ${sck_pin}
+    gain: 128
+    update_interval: 5s
+    accuracy_decimals: 2
+    filters:
+      - round: 2
+      - calibrate_linear:
+          # Mapping raw HX711 units to kilograms
+          - 65350 -> -1.3
+          - 88500 -> 0
+    unit_of_measurement: kg
+
+  # Helper sensor: Displays raw capacitive value (useful for fine-tuning the threshold)
+  - platform: template
+    name: "Raw Leakage Value"
+    lambda: |-
+        return id(binary_leakage).get_value();
+    update_interval: 600s
+
+  # Diagnostic: Wi-Fi signal strength (RSSI)
+  - platform: wifi_signal
+    name: "Wifi Signal"
+    update_interval: 60s
+    icon: mdi:wifi
+
+  # Diagnostic: System uptime since last reboot
+  - platform: uptime
+    name: "Uptime"
+    update_interval: 60s
+    icon: mdi:clock-outline
+
+text_sensor:
+  # Network status information
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+    ssid:
+      name: "Wi-Fi SSID"
+    bssid:
+      name: "Wi-Fi BSSID"
+  # Currently running ESPHome firmware version
+  - platform: version
+    name: "ESPHome Version"
+    hide_timestamp: true
